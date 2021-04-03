@@ -30,7 +30,13 @@ setup(
     url="https://github.com/jlsteenwyk/phykit",
     packages=find_packages(),
     classifiers=CLASSIFIERS,
-    entry_points={"console_scripts": ["phykit = phykit.phykit:main"]},
+    entry_points={
+        "console_scripts": [
+            "phykit = phykit.phykit:main",
+            "pk_alignment_length = phykit.phykit:alignment_length",
+            "pk_bss = phykit.phykit:bss",
+        ]
+    },
     version=__version__,
     include_package_data=True,
     install_requires=REQUIRES,

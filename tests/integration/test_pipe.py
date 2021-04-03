@@ -47,3 +47,9 @@ class TestBrokenPipeError(object):
         exit_status = os.system(cmd)
         assert exit_status == 0
 
+    @pytest.mark.slow
+    def test_pk_bipartition_support_stats_BrokenPipeError(self):
+        cmd = "pk_bss ./tests/sample_files/small_Aspergillus_tre_rooted.tree -v | head -n 1"
+        exit_status = os.system(cmd)
+        assert exit_status == 0
+

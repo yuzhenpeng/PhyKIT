@@ -59,6 +59,22 @@ ch = logging.StreamHandler()
 ch.setLevel(logging.INFO)
 logger.addHandler(ch)
 
+help_header = f"""
+             _____  _           _  _______ _______ 
+            |  __ \| |         | |/ /_   _|__   __|
+            | |__) | |__  _   _| ' /  | |    | |   
+            |  ___/| '_ \| | | |  <   | |    | |   
+            | |    | | | | |_| | . \ _| |_   | |   
+            |_|    |_| |_|\__, |_|\_\_____|  |_|   
+                           __/ |                   
+                          |___/   
+                        
+            Version: {__version__}
+            Citation: Steenwyk et al. 2021, Bioinformatics. doi: 10.1093/bioinformatics/btab096
+            https://academic.oup.com/bioinformatics/advance-article-abstract/doi/10.1093/bioinformatics/btab096/6131675
+
+"""
+
 
 class Phykit(object):
     help_header = f"""
@@ -203,20 +219,20 @@ class Phykit(object):
         # run_alias function
         try:
             if hasattr(self, args.command):
-                getattr(self, args.command)()
+                getattr(self, args.command)(sys.argv[2:])
             else:
-                self.run_alias(args.command)
+                self.run_alias(args.command, sys.argv[2:])
         except NameError:
             sys.exit()
 
     ## Aliases
-    def run_alias(self, command):
+    def run_alias(self, command, argv):
         # version
         if command in ['v']:
             return self.version()
         # Alignment aliases
         if command in ['aln_len', 'al']:
-            return self.alignment_length()
+            return self.alignment_length(argv)
         elif command in ['aln_len_no_gaps', 'alng']:
             return self.alignment_length_no_gaps()
         elif command in 'cs':
@@ -239,7 +255,7 @@ class Phykit(object):
             return self.variable_sites()
         # Tree aliases
         elif command == 'bss':
-            return self.bipartition_support_stats()
+            return self.bipartition_support_stats(argv)
         elif command == 'blm':
             return self.branch_length_multiplier()
         elif command in ['collapse', 'cb']:
@@ -298,13 +314,14 @@ class Phykit(object):
         ))
 
     ## Alignment functions
-    def alignment_length(self):
+    @staticmethod
+    def alignment_length(argv):
         parser = ArgumentParser(add_help=True,
             usage=SUPPRESS,
             formatter_class=RawDescriptionHelpFormatter,
             description=textwrap.dedent(
                 f"""\
-                {self.help_header}
+                {help_header}
 
                 Length of an input alignment is calculated using this function.
 
@@ -328,7 +345,7 @@ class Phykit(object):
             ),
         )
         parser.add_argument("alignment", type=str, help=SUPPRESS)
-        args = parser.parse_args(sys.argv[2:])
+        args = parser.parse_args(argv)
         AlignmentLength(args).run()
 
     def alignment_length_no_gaps(self):
@@ -728,13 +745,14 @@ class Phykit(object):
 
 
     ## Tree functions
-    def bipartition_support_stats(self):
+    @staticmethod
+    def bipartition_support_stats(argv):
         parser = ArgumentParser(add_help=True,
             usage=SUPPRESS,
             formatter_class=RawDescriptionHelpFormatter,
             description=textwrap.dedent(
                 f"""\
-                {self.help_header}
+                {help_header}
                 Calculate summary statistics for bipartition support.
 
                 High bipartition support values are thought to be desirable because
@@ -767,7 +785,7 @@ class Phykit(object):
             required=False,
             help=SUPPRESS
         )
-        args = parser.parse_args(sys.argv[2:])
+        args = parser.parse_args(argv)
         BipartitionSupportStats(args).run()
 
     def branch_length_multiplier(self):
@@ -1719,3 +1737,10 @@ class Phykit(object):
 
 def main(argv=None):
     Phykit()
+
+def alignment_length(argv=None):
+    Phykit.alignment_length(sys.argv[1:])
+
+def bss(argv=None):
+    Phykit.bipartition_support_stats(sys.argv[1:])
+
